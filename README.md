@@ -1,4 +1,4 @@
-#ToDo
+# ToDo
 
 jQuery, bootstrap, HTML5 project details:
 
@@ -25,10 +25,3 @@ jQuery, bootstrap, HTML5 project details:
 11- use node package manager(npm) to install all libs you need.
 
 12- use Bootstrap to add good look to the app with some custom styles.
-
-13- attached is a video demo to see how should this app works.
-
-14- the deadline for this project is Sunday 2, April at midnight.
-
-15- the deliverables will be a zipped folder (NOT rar) with your name containing the code and a readme file with all login credentials I need to login and test your app.
-16- Good luck!
