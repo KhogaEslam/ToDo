@@ -25,3 +25,7 @@ jQuery, bootstrap, HTML5 project details:
 11- use node package manager(npm) to install all libs you need.
 
 12- use Bootstrap to add good look to the app with some custom styles.
+
+![alt tag](https://github.com/KhogaEslam/ToDo/blob/master/screenshots/0.png)
+
+![alt tag](https://github.com/KhogaEslam/ToDo/blob/master/screenshots/1.png)
