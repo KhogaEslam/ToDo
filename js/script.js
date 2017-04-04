@@ -10,6 +10,16 @@ var User = {
       tx.executeSql("CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY  AUTOINCREMENT, username TEXT NOT NULL, password TEXT NOT NULL) ");
     });
   },
+  registerUser: function(username,password){
+    db.transaction(function(tx){
+      tx.executeSql("INSERT INTO User (username, password) VALUES (?,?)",[username,password],
+                function (tx, result) {
+                    console.log("Query Success");
+                },
+                function (tx, error) {
+                    console.log("Query Error: " + error.message);
+                });
+  },
   retrieveUser: function(name, password){
     return new Promise(function(resolve, reject) {
       db.transaction(function(tx){
@@ -31,6 +41,7 @@ var User = {
   },
 };
 User.createTable();
+User.registerUser("user","12345");
 /* End User Object */
 ////////////////////////////////////////////////////////////////////////////////
 /* Item Object */
