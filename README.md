@@ -1,5 +1,7 @@
 # ToDo
 
+[To Test use: user & 12345 as Username and Password]
+
 jQuery, bootstrap, HTML5 project details:
 
 01- implement Todo list using jQuery library.
