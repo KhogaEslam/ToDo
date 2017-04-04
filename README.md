@@ -26,6 +26,10 @@ jQuery, bootstrap, HTML5 project details:
 
 12- use Bootstrap to add good look to the app with some custom styles.
 
+** Login Page **
+
 ![alt tag](https://github.com/KhogaEslam/ToDo/blob/master/screenshots/0.png)
+
+** Items Page **
 
 ![alt tag](https://github.com/KhogaEslam/ToDo/blob/master/screenshots/1.png)
