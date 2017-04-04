@@ -1,0 +1,84 @@
+html,body{
+  height: 100%;
+}
+.hiddenContents{
+  display: none;
+}
+#comp,#ncomp{
+  height: 100%;
+}
+.mycontainer{
+  width: 49%;
+  display: inline-block;
+}
+.todoItem{
+  background-color: #333;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+}
+.isComp{
+  background-color: #588b57;
+}
+.isNComp{
+  background-color: #927747;
+}
+#content h1,#content h2,#content h3, #content p{
+  color: #fff !important;
+}
+
+#addForm, #updateForm{
+  font-size: 15px;
+  display: block;
+  width: 350px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+.addForm, .updateForm, .addNew, .updateFormItem, .cancelUpdate, .cancel, input,select,select option{
+  padding: 20px;
+  display: block;
+  width: 300px;
+  border:1px solid;
+  border-radius: 10px;
+  margin: 5px !important;
+}
+.addForm, .addNew, .cancel, .updateFormItem, .cancelUpdate{
+  background-color: #333;
+  color: #fff;
+}
+
+.addForm, .updateForm{
+  display: block;
+  width: 350px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.clearfx{
+  clear: both;
+}
+.popUp, .popUpUpdate, .popUpLogin{
+  display: none;
+  position: fixed;
+  top:0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  padding-top: 50px;
+}
+
+#errMsgLogin{
+  font-size: 15px;
+  display: block;
+  width: 350px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="node_modules/jquery-ui-dist/jquery-ui.js"></script>
+
+    <title>ToDo</title>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Crossover ToDo</a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse">
+            <div  id="searchandlogout" class="hiddenContents navbar-form navbar-right">
+              <div class="form-group">
+                <input id="search" type="text" class="form-control" placeholder="Search by title">
+              </div>
+              <button id="logout" type="button" class="btn btn-default">logout</button>
+            </div>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+
+      <div class="jumbotron">
+        <div class="container">
+          <h1>Cross over ToDo app</h1>
+          <p>This is an app to create, edit and organize your upcoming tasks!.</p>
+      </div>
+      </div>
+    </header>
+    <div class="hiddenContents">
+      <div class="container">
+        <div class="mycontainer">
+          <div class="alert alert-warning" role="alert"> <strong>Hurry up!</strong> You have to complete all these ToDo items. </div>
+        </div>
+        <div class="mycontainer">
+          <div class="alert alert-success" role="alert"> <strong>Well done!</strong> You successfully completed all these ToDo items. </div>
+        </div>
+      </div>
+      <div class="container" id="content">
+        <div class="mycontainer">
+          <div id="ncomp">
+          </div>
+        </div>
+
+        <div class="mycontainer">
+          <div id="comp">
+          </div>
+        </div>
+
+        <div class="clearfx">
+
+        </div>
+      </div>
+      <div class="popUp" >
+        <div id="errMsg">
+
+        </div>
+      </div>
+      <div class="popUp" >
+          <form id="addForm">
+              <input type="text" name="name" placeholder="Enter Note Title">
+              <input type="text" name="desc" placeholder="Enter Note Details">
+              <select name="isComp">
+                <option value="true">Completed</option>
+                <option value="false">Not Completed</option>
+              </select>
+              <button class="addNew">Add Note</button>
+              <button class="cancel">Cancel</button>
+          </form>
+      </div>
+
+      <center>
+        <button class="addForm btn btn-primary">+Add New Note</button>
+      </center>
+    </div>
+    <div class="loginForm col-md-4 col-md-offset-4">
+      <form id="loginForm" class="login">
+        <input id="Username" class="form-control" type="text" name="username" placeholder="Username">
+        <input id="Password" class="form-control" type="password" name="password" placeholder="Password">
+        <button id="Login" class="form-control btn btn-primary" name="Login">Login</button>
+      </form>
+    </div>
+    <div class="popUpLogin" >
+      <div id="errMsgLogin" class="btn-danger">
+
+      </div>
+    </div>
+    <div class="popUpUpdate" >
+        <form id="updateForm">
+            <input type="text" name="name" placeholder="Enter Note Title">
+            <input type="text" name="desc" placeholder="Enter Note Details">
+            <select name="isComp">
+              <option value="true">Completed</option>
+              <option value="false">Not Completed</option>
+            </select>
+            <button id="updateFormItem" class="updateFormItem">Update Note</button>
+            <button class="cancelUpdate">Cancel</button>
+        </form>
+    </div>
+
+    <script type="text/javascript" src="js/script.js">
+    </script>
+  <footer>
+
+  </footer>
+  </body>
+</html>

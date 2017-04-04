@@ -1,0 +1,26 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "This is Simple ToDo Application",
+  "main": "index.js",
+  "scripts": {
+    "test": "todo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KhogaEslam/ToDo.git"
+  },
+  "author": "Eslam Gamal Khoga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KhogaEslam/ToDo/issues"
+  },
+  "homepage": "https://github.com/KhogaEslam/ToDo#readme",
+  "dependencies": {
+    "animate.css": "^3.5.2",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
+    "jquery-ui-dist": "^1.12.1"
+  }
+}
