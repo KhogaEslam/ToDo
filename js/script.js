@@ -14,11 +14,12 @@ var User = {
     db.transaction(function(tx){
       tx.executeSql("INSERT INTO User (username, password) VALUES (?,?)",[username,password],
                 function (tx, result) {
-                    console.log("Query Success");
+                    console.log("INSERT INTO User Query Success");
                 },
                 function (tx, error) {
-                    console.log("Query Error: " + error.message);
+                    console.log("INSERT INTO User Query Error: " + error.message);
                 });
+    });
   },
   retrieveUser: function(name, password){
     return new Promise(function(resolve, reject) {
@@ -53,7 +54,7 @@ var Item = {
     });
   },
   insertItem: function(myItem){
-    console.log(myItem['name'], myItem['desc'], myItem['isComp'], myItem['userId']);
+    //console.log(myItem['name'], myItem['desc'], myItem['isComp'], myItem['userId']);
     return new Promise(function(resolve, reject) {
       db.transaction(function(tx){
         tx.executeSql("INSERT INTO Item (name,desc,isComp,userId) VALUES (?,?,?,?)",[myItem['name'], myItem['desc'], myItem['isComp'], myItem['userId']],
@@ -72,54 +73,53 @@ var Item = {
     db.transaction(function(tx){
       tx.executeSql("UPDATE Item SET name = ? , desc = ? , isComp = ? WHERE id = ?",[myItem['name'], myItem['desc'], myItem['isComp'], id],
                 function (tx, result) {
-                    console.log("Query Success");
+                    console.log("UPDATE Item Query Success");
                 },
                 function (tx, error) {
-                    console.log("Query Error: " + error.message);
+                    console.log("UPDATE Item Query Error: " + error.message);
                 });
     },
     function (error) {
-
-        console.log("Transaction Error: " + error.message);
+        console.log("UPDATE Item Transaction Error: " + error.message);
     },
     function () {
-        console.log("Transaction Success");
+        console.log("UPDATE Item Transaction Success");
     });
   },
   deleteItem: function(id){
     db.transaction(function(tx){
       tx.executeSql("DELETE FROM Item WHERE id = ?",[id, ],
                 function (tx, result) {
-                    console.log("Query Success");
+                    console.log("DELETE FROM Item Query Success");
                 },
                 function (tx, error) {
-                    console.log("Query Error: " + error.message);
+                    console.log("DELETE FROM Item Query Error: " + error.message);
                 });
     },
     function (error) {
 
-        console.log("Transaction Error: " + error.message);
+        console.log("DELETE FROM Item Transaction Error: " + error.message);
     },
     function () {
-        console.log("Transaction Success");
+        console.log("DELETE FROM Item Transaction Success");
     });
   },
   updateItemStatus: function(myItem,id){
     db.transaction(function(tx){
       tx.executeSql("UPDATE Item SET isComp = ? WHERE id = ?",[myItem['isComp'], id, ],
                 function (tx, result) {
-                    console.log("Query Success");
+                    console.log("UPDATE Item Query Success");
                 },
                 function (tx, error) {
-                    console.log("Query Error: " + error.message);
+                    console.log("UPDATE Item Query Error: " + error.message);
                 });
     },
     function (error) {
 
-        console.log("Transaction Error: " + error.message);
+        console.log("UPDATE Item Transaction Error: " + error.message);
     },
     function () {
-        console.log("Transaction Success");
+        console.log("UPDATE Item Transaction Success");
     });
   },
   retrieveItem: function(id){
@@ -195,7 +195,7 @@ function renderItems(Items){
       $('<div class="todoItem isComp"></div>')
       .data( 'isComp', Items[i]['isComp'] )
       .attr( 'id', Items[i]['id'] )
-      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span>')
+      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span><a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
       .appendTo( '#comp' )
       .draggable( {
         containment: '#content',
@@ -221,7 +221,7 @@ function renderItems(Items){
       $('<div class="todoItem isNComp"></div>')
       .data( 'isComp', Items[i]['isComp'] )
       .attr( 'id', Items[i]['id'] )
-      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span>')
+      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
       .appendTo( '#ncomp' )
       .draggable( {
         containment: '#content',
@@ -251,17 +251,25 @@ function handleItemDrop( event, ui ) {
   var dropPlace = $(this).data( 'isComp' );
   var dropped = ui.draggable.data( 'isComp' );
   var id = ui.draggable[0]['id'];
-  console.log(dropPlace, dropped, id,ui.draggable);
+  //console.log(dropPlace, dropped, id,ui.draggable);
   if ( (dropPlace == 'true' && dropped == 'false') ) {
-    console.log("cond: ",dropPlace, dropped);
+    //console.log("cond: ",dropPlace, dropped);
     $('#comp').append(ui.draggable);
     ui.draggable.data( 'isComp',"true" );
+    ui.draggable.attr( 'class', "todoItem isComp" );
     Item.updateItemStatus({'isComp':true},id);
+    // $('#comp').empty();
+    // $('#ncomp').empty();
+    // prepareUserItems(currentUserID);
   }
   else if( dropPlace == 'false' && dropped == 'true' ){
     $('#ncomp').append(ui.draggable);
     ui.draggable.data( 'isComp',"false" );
+    ui.draggable.attr( 'class', "todoItem isNComp" );
     Item.updateItemStatus({'isComp':false},id);
+    // $('#comp').empty();
+    // $('#ncomp').empty();
+    // prepareUserItems(currentUserID);
   }
 }
 
@@ -284,12 +292,12 @@ $(document).ready(function(){
     e.preventDefault();
     var formData= $("#loginForm").serializeArray();
     var userData={};
-    console.log("Form Data:",formData);
+    //console.log("Form Data:",formData);
     for (var i = 0; i < formData.length; i++) {
       userData[formData[i].name] = formData[i].value
     }
     //userData['userId'] = currentUserID;
-    console.log("newItem Data:",userData);
+    //console.log("newItem Data:",userData);
 
     var username = $("#Username").val();
     var password = $("#Password").val();
@@ -309,7 +317,7 @@ $(document).ready(function(){
       User.retrieveUser(username,password).then(function(result) {
         if(result.status == 'success'){
           var user = result.data;
-          console.log("User Data:",user);
+          //console.log("User Data:",user);
           $('.hiddenContents').toggle();
           $('.loginForm').toggle();
           currentUserID = user[0]['id']
@@ -318,14 +326,14 @@ $(document).ready(function(){
         else {
             var errMsg = $('#errMsgLogin');
             errMsg.html("<center><h4>Error!</h4><p>Invalid User Name Or Password</p></center>");
-            console.log(result.data, errMsg);
+            //console.log(result.data, errMsg);
             $('.popUpLogin').slideDown();
         }
       }, function(err) {
         Error(err.data)
         var errMsg = $('#errMsgLogin');
         errMsg.html("<center><p>"+result.data+"</p></center>");
-        console.log(result.data, errMsg);
+        //console.log(result.data, errMsg);
         $('.popUpLogin').slideDown();
       });
     }
@@ -343,26 +351,34 @@ $(document).ready(function(){
     $('.loginForm').toggle();
   });
 
+  $('body').on('click','#deleteItem',function(e){
+    //console.log($(this).parent().attr('id'));
+    //add delete from db
+    var itemId = $(this).parent().attr('id');
+    Item.deleteItem(itemId);
+    $(this).parent().remove();
+  });
+
   $("#addForm").submit(function(e){
     e.preventDefault();
     var formData= $("#addForm").serializeArray();
     var newItem={};
-    console.log("Form Data:",formData);
+    //console.log("Form Data:",formData);
     for (var i = 0; i < formData.length; i++) {
       newItem[formData[i].name] = formData[i].value
     }
     newItem['userId'] = currentUserID;
-    console.log("newItem Data:",newItem);
+    //console.log("newItem Data:",newItem);
 
     Item.insertItem(newItem).then(function(result) {
       if(result.status == 'success'){
         id = result.data.insertId;
-        console.log(id);
+        //console.log(id);
         if(newItem['isComp'] == 'true'){
           $('<div class="todoItem isComp"></div>')
           .data( 'isComp', 'true' )
           .attr( 'id', id )
-          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span>')
+          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
           .appendTo( '#comp' )
           .draggable( {
             containment: '#content',
@@ -385,7 +401,7 @@ $(document).ready(function(){
           $('<div class="todoItem isNComp"></div>')
           .data( 'isComp', 'false' )
           .attr( 'id', id )
-          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span>')
+          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
           .appendTo( '#ncomp' )
           .draggable( {
             containment: '#content',
@@ -408,14 +424,14 @@ $(document).ready(function(){
       else {
           var errMsg = $('#errMsgLogin');
           errMsg.html("<center><h4>Error!</h4><p>Invalid User Name Or Password</p></center>");
-          console.log(result.data, errMsg);
+          //console.log(result.data, errMsg);
           $('.popUpLogin').slideDown();
       }
     }, function(err) {
       Error(err.data)
       var errMsg = $('#errMsgLogin');
       errMsg.html("<center><p>"+result.data+"</p></center>");
-      console.log(result.data, errMsg);
+      //console.log(result.data, errMsg);
       $('.popUpLogin').slideDown();
     });
 
@@ -457,7 +473,7 @@ $(document).ready(function(){
     e.preventDefault();
     var itemId = $(this)[0].id;
     currentItemId = itemId;
-    console.log("item id",itemId);
+    //console.log("item id",itemId);
     var itemName = $(this).find("#itemName").text();
     var itemDesc = $(this).find("#itemDesc").text();
     var itemStatus = $(this).data('isComp');
@@ -478,7 +494,7 @@ $(document).ready(function(){
     //   errMsg.innerHTML += "<center><p>"+result.data+"</p></center>";
     // });
     */
-    console.log(itemStatus);
+    //console.log(itemStatus);
 
     var newUpdate = '<form id="updateItemForm">\
                       <input type="text" name="name" placeholder="Enter Note Title" value="'+itemName+'">\
@@ -502,9 +518,9 @@ $(document).ready(function(){
 ////////////////////////////////////////////////////////////////////////////////
   $('body').on('click','#updateFormItem',function(e){
     e.preventDefault();
-    console.log(e);
+    //console.log(e);
     var itemId = currentItemId;
-    console.log(itemId);
+    //console.log(itemId);
     var formData= $("#updateItemForm").serializeArray();
     var newItem={};
     for (var i = 0; i < formData.length; i++) {
