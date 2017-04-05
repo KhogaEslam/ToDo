@@ -1,13 +1,19 @@
 html,body{
   height: 100%;
 }
-.hiddenContents{
+.hiddenContents, .singleItem{
   display: none;
+  height: 100%;
+}
+#content{
+  /*height: 100%;*/
 }
 #comp,#ncomp{
   height: 100%;
+  min-height: 168px;
 }
 .mycontainer{
+  height: 100%;
   width: 49%;
   display: inline-block;
 }
@@ -19,9 +25,11 @@ html,body{
 }
 .isComp{
   background-color: #588b57;
+  position: relative;
 }
 .isNComp{
   background-color: #927747;
+  position: relative;
 }
 #content h1,#content h2,#content h3, #content p{
   color: #fff !important;
@@ -83,8 +91,30 @@ html,body{
   box-sizing: border-box;
 }
 
-#deleteItem{
+#deleteItem, #deleteSingleItem{
   position: absolute;
   top: 10px;
   right: 10px;
+}
+
+.drag-over, .ui-droppable-hover, .ui-droppable-active{
+    border: 2px solid green;
+    box-shadow: 0 0 3px blue;
+    background-color: grey;
+}
+
+#droppable
+{
+  width: 150px;
+  height: 150px;
+  padding: 0.5em;
+  float: left;
+  margin: 10px;
+}
+#draggable, #draggable-nonvalid {
+  width: 100px;
+  height: 100px;
+  padding: 0.5em;
+  float: left;
+  margin: 10px 10px 10px 0;
 }

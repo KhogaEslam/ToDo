@@ -1,5 +1,6 @@
 var currentUserID = 1;
 var itemsList = "";
+var currentItemID = "";
 /*Initialize Database Object*/
 var db = openDatabase("ToDo", "1.0", "Description", 1*1024*1024);
 /* User Object */
@@ -160,6 +161,26 @@ var Item = {
         });
     });
   },
+  searchItems: function(uid, keyword){
+    return new Promise(function(resolve, reject) {
+      db.transaction(function(tx){
+        tx.executeSql("SELECT * FROM Item WHERE userId = ? and name like ?",[uid, "%"+keyword+"%", ],function(tx,res){
+          console.log("inside select", uid, keyword);
+          if(res){
+            if (!res.rows.length) {
+              resolve({status:'error',data:'No Items in database'});
+            }
+            else {
+              resolve({status:'success',data:res.rows});
+            }
+          }
+          else{
+            reject({status:'conError',data:'Connection Error !'});
+          }
+        });
+      });
+    });
+  }
 };
 Item.createTable();
 /* End Item Object */
@@ -195,20 +216,21 @@ function renderItems(Items){
       $('<div class="todoItem isComp"></div>')
       .data( 'isComp', Items[i]['isComp'] )
       .attr( 'id', Items[i]['id'] )
-      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span><a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
+      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span><a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="'+Items[i]['id']+'" class="itemDetails">Details</a></center></p>')
       .appendTo( '#comp' )
       .draggable( {
         containment: '#content',
-        stack: '#comp div',
+        stack: '#comp',
         cursor: 'move',
         revert: true
       } )
       .droppable( {
-        accept: '#ncomp div',
-        drop: handleItemDrop
+        accept: '#isNComp',
+        drop: handleItemDrop,
       } )
       .css({'margin':'auto','margin-top': '300px'})
       .animate({'margin-top': '5px'}, 1000);
+      //.effect( "bounce", {times:1}, 100 );
 
       // comp.innerHTML += '<div ondragstart="dragstart(event)" draggable="true"\
       // id="'+Items[i]['id']+'"><h1>'+Items[i]['name']+'</h1>\
@@ -221,20 +243,24 @@ function renderItems(Items){
       $('<div class="todoItem isNComp"></div>')
       .data( 'isComp', Items[i]['isComp'] )
       .attr( 'id', Items[i]['id'] )
-      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
+      .append('<h3 id="itemName">'+Items[i]['name']+'</h3>'+'<p id="itemDesc">'+Items[i]['desc']+'</p>'+' :: <span>'+Items[i]['addDate']+'</span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="'+Items[i]['id']+'" class="itemDetails">Details</a></center></p>')
       .appendTo( '#ncomp' )
       .draggable( {
         containment: '#content',
-        stack: '#ncomp div',
+        stack: '#ncomp',
         cursor: 'move',
-        revert: true
+        revert: true,
+        // drag: handleItemDrag,
       } )
       .droppable( {
-        accept: '#comp div',
-        drop: handleItemDrop
+        accept: '#isComp',
+        drop: handleItemDrop,
+        // over: handleItemOver,
+        // out: handleItemOut,
       } )
       .css({'margin':'auto','margin-top': '300px'})
       .animate({'margin-top': '5px'}, 1000);
+      //.effect( "bounce", {times:1}, 100 );
       // ncomp.innerHTML += '<div ondragstart="dragstart(event)" draggable="true"\
       // id="'+Items[i]['id']+'"><h1>'+Items[i]['name']+'</h1>\
       // <p>'+Items[i]['desc']+'</p>\
@@ -246,9 +272,38 @@ function renderItems(Items){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
+/*
+// function handleItemDrag(vent, ui) {
+//   var $droppable = $(this).data("current-droppable");
+//   if ($droppable) {
+//       if (/* mouse is in top half of row ) {
+//           $droppable.removeClass("droppable-below")
+//                     .addClass("droppable-above");
+//       } else {
+//           $droppable.removeClass("droppable-above")
+//                     .addClass("droppable-below");
+//       }
+//   }
+// }
+// function handleItemOver(event, ui) {
+//         if (/* mouse is in top half of row ) {
+//             $(this).removeClass("droppable-below")
+//                    .addClass("droppable-above");
+//         }
+//         else {
+//             $(this).removeClass("droppable-above")
+//                    .addClass("droppable-below");
+//         }
+//         ui.draggable.data("current-droppable", $(this));  // Associate.
+// }
+// function handleItemOut(event, ui) {
+//         ui.draggable.removeData("current-droppable");     // Break association.
+//         $(this).removeClass("droppable-above droppable-below");
+// }*/
 function handleItemDrop( event, ui ) {
   var dropPlace = $(this).data( 'isComp' );
+  // $(this).css("border","2px solid red");
+  // $(this).css("box-shadow","0 0 3px red");
   var dropped = ui.draggable.data( 'isComp' );
   var id = ui.draggable[0]['id'];
   //console.log(dropPlace, dropped, id,ui.draggable);
@@ -278,14 +333,16 @@ $(document).ready(function(){
   $("#ncomp")
   .data( 'isComp', 'false' )
   .droppable( {
-    accept: '#comp div',
-    drop: handleItemDrop
+    accept: '.isComp',
+    drop: handleItemDrop,
+    hoverClass: "drag-over",
   } );
   $("#comp")
   .data( 'isComp', 'true' )
   .droppable( {
-    accept: '#ncomp div',
-    drop: handleItemDrop
+    accept: '.isNComp',
+    drop: handleItemDrop,
+    hoverClass: "drag-over",
   } );
 
   $("#loginForm").submit(function(e){
@@ -355,8 +412,12 @@ $(document).ready(function(){
     //console.log($(this).parent().attr('id'));
     //add delete from db
     var itemId = $(this).parent().attr('id');
-    Item.deleteItem(itemId);
-    $(this).parent().remove();
+    currentItemId = itemId;
+    var isGood=confirm('Are You Sure You Want to delete this note ?');
+    if (isGood) {
+      Item.deleteItem(currentItemId);
+      $(this).parent().remove();
+    }
   });
 
   $("#addForm").submit(function(e){
@@ -378,17 +439,17 @@ $(document).ready(function(){
           $('<div class="todoItem isComp"></div>')
           .data( 'isComp', 'true' )
           .attr( 'id', id )
-          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
+          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="'+id+'" class="itemDetails">Details</a></center></p>')
           .appendTo( '#comp' )
           .draggable( {
             containment: '#content',
-            stack: '#comp div',
+            stack: '#comp',
             cursor: 'move',
             revert: true
           } )
           .droppable( {
-            accept: '#ncomp div',
-            drop: handleItemDrop
+            accept: '#isNComp',
+            drop: handleItemDrop,
           } )
           .css({'margin':'auto','margin-top': '300px'})
           .animate({'margin-top': '5px'}, 1000);
@@ -401,17 +462,20 @@ $(document).ready(function(){
           $('<div class="todoItem isNComp"></div>')
           .data( 'isComp', 'false' )
           .attr( 'id', id )
-          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="itemDetails">Details</a></center></p>')
+          .append('<h3>'+newItem['name']+'</h3>'+'<p>'+newItem['desc']+'</p>'+' :: <span>'+(new Date())+'</span></span> <a id="deleteItem" class="glyphicon glyphicon-trash"></a> <p><center><a id="'+id+'" class="itemDetails">Details</a></center></p>')
           .appendTo( '#ncomp' )
           .draggable( {
             containment: '#content',
-            stack: '#ncomp div',
+            stack: '#ncomp',
             cursor: 'move',
-            revert: true
+            revert: true,
+            // drag: handleItemDrag,
           } )
           .droppable( {
-            accept: '#comp div',
-            drop: handleItemDrop
+            accept: '#isComp',
+            drop: handleItemDrop,
+            // over: handleItemOver,
+            // out: handleItemOut,
           } )
           .css({'margin':'auto','margin-top': '300px'})
           .animate({'margin-top': '5px'}, 1000);
@@ -455,10 +519,42 @@ $(document).ready(function(){
   /////////////////////////////////
   $('.addForm').on('click', function(e) {
     e.preventDefault();
+    $('#comp').empty();
+    $('#ncomp').empty();
+    prepareUserItems(currentUserID);
     $('.popUp').slideDown();
     $(this).toggle('hide');
   });
 
+  $('#search').on('keyup', function(e) {
+    // e.preventDefault();
+    $('#comp').empty();
+    $('#ncomp').empty();
+    var content = $(this).val();
+
+    if(content != '' || content != ' '){
+      Item.searchItems(currentUserID, content).then(function(result) {
+        console.log(content, result);
+        if(result.status == 'success'){
+          itemsList = result.data;
+          renderItems(itemsList);
+        }
+        else {
+            var errMsg = document.querySelector('#errMsg');
+            errMsg.innerHTML += "<center><p><h1><strong>"+result.data+"</strong></h1></p></center>";
+        }
+      }, function(err) {
+        Error(err.data)
+        var errMsg = document.querySelector('#errMsg');
+        errMsg.innerHTML += "<center><p>"+result.data+"</p></center>";
+      });
+    }
+    else{
+      $('#comp').empty();
+      $('#ncomp').empty();
+      prepareUserItems(currentUserID);
+    }
+  });
   /////////////////////////////////
 
   $('body').on('click','#delete',function(e){
@@ -534,6 +630,108 @@ $(document).ready(function(){
     prepareUserItems(currentUserID);
 
   });
+
+  $('body').on('click','.itemDetails',function(e){
+    e.preventDefault();
+    var id = $(this)[0].id;
+    var item = "";
+    Item.retrieveItem(id).then(function(result) {
+      if(result.status == 'success'){
+        item = result.data;
+        console.log(item[0]);
+        renderItem(item[0]);
+      }
+      else {
+          var errMsg = document.querySelector('#errMsg');
+          errMsg.innerHTML += "<center><p><h1><strong>"+result.data+"</strong></h1></p></center>";
+      }
+    }, function(err) {
+      Error(err.data)
+      var errMsg = document.querySelector('#errMsg');
+      errMsg.innerHTML += "<center><p>"+result.data+"</p></center>";
+    });
+
+  });
+
+
+  function renderItem(Item){
+    $('.hiddenContents').toggle();
+    $('.singleItem').toggle();
+    if(Item['isComp'] == "true"){
+      $('<div class="todoItem isComp"></div>')
+      .data( 'isComp', Item['isComp'] )
+      .attr( 'id', Item['id'] )
+      .append('<a id="deleteSingleItem" class="glyphicon glyphicon-trash"></a><h3 id="itemName">'+Item['name']+'</h3>'+'<p id="itemDesc">'+Item['desc']+'</p>'+' :: <span>'+Item['addDate']+'</span>')
+      .appendTo( '#singleItem' )
+      .css({'margin':'auto','margin-top': '300px'})
+      .animate({'margin-top': '5px'}, 1000);
+      //.effect( "bounce", {times:1}, 100 );
+
+      // comp.innerHTML += '<div ondragstart="dragstart(event)" draggable="true"\
+      // id="'+Item['id']+'"><h1>'+Item['name']+'</h1>\
+      // <p>'+Item['desc']+'</p>\
+      // <button id="update">Update</button>\
+      // <button id="delete">Delete</button>\
+      // </div>';
+    }
+    else{
+      $('<div class="todoItem isNComp"></div>')
+      .data( 'isComp', Item['isComp'] )
+      .attr( 'id', Item['id'] )
+      .append(' <a id="deleteSingleItem" class="glyphicon glyphicon-trash"></a> <h3 id="itemName">'+Item['name']+'</h3>'+'<p id="itemDesc">'+Item['desc']+'</p>'+' :: <span>'+Item['addDate']+'</span>')
+      .appendTo( '#singleItem' )
+      .css({'margin':'auto','margin-top': '300px'})
+      .animate({'margin-top': '5px'}, 1000);
+      //.effect( "bounce", {times:1}, 100 );
+      // ncomp.innerHTML += '<div ondragstart="dragstart(event)" draggable="true"\
+      // id="'+Item['id']+'"><h1>'+Item['name']+'</h1>\
+      // <p>'+Item['desc']+'</p>\
+      // <button id="update">Update</button>\
+      // <button id="delete">Delete</button>\
+      // </div>';
+    }
+
+  }
+  $('.backToAll').on('click', function(e) {
+    e.preventDefault();
+    $('.hiddenContents').toggle();
+    $('.singleItem').toggle();
+    $('#singleItem').html('');
+    $('#comp').empty();
+    $('#ncomp').empty();
+    prepareUserItems(currentUserID);
+  });
+
+  $('body').on('click','#deleteSingleItem',function(e){
+    //add delete from db
+    var itemId = $(this).parent().attr('id');
+    currentItemId = itemId;
+    var isGood=confirm('Are You Sure You Want to delete this note ?');
+    if (isGood) {
+      Item.deleteItem(currentItemId);
+      $(this).parent().remove();
+      $('.hiddenContents').toggle();
+      $('.singleItem').toggle();
+      $('#singleItem').html('');
+      $('#comp').empty();
+      $('#ncomp').empty();
+      prepareUserItems(currentUserID);
+    } else {
+
+    }
+  });
+  // $( "#ncomp" ).droppable( {
+  //   accept: '#isComp',
+  //   hoverClass: "drag-over",
+  //   drop: handleItemDrop,
+  //   // over: handleItemOver,
+  //   // out: handleItemOut,
+  // } );
+  // $( "#comp" ).droppable( {
+  //   accept: '#isNComp',
+  //   hoverClass: "drag-over",
+  //   drop: handleItemDrop,
+  // } );
 });
 
 ////////////////////////////////////////////////////////////////////////////////
